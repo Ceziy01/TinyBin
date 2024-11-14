@@ -8,6 +8,16 @@
 # Supported languages
 - English
 - Russian
+- Belarusian
+- French
+- German
+- Spanish
+- Portuguese
+- Polish
+- Italian
+- Chinese
+- Japanese
+- Korean
 
 # App's functions
 - Drag and drop files on app's icon in systray to move them to recycle been:
