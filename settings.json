@@ -1,1 +1,6 @@
-{"app_name": "TinyBin", "icon_path": "./bin.png", "version": "v0.1.2", "lang": "./eng.json"}
+{
+    "app_name": "TinyBin",
+    "icon_path": "./assets/bin.png",
+    "version": "v0.2.0",
+    "lang": "./lang/en.json"
+}

@@ -5,27 +5,6 @@ from PyQt6.QtWidgets import QApplication, QWidget, QSystemTrayIcon, QMenu, QFile
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QCursor, QIcon
 
-def initFile(path, content, mode = "w"):
-    if not os.path.exists(path):
-        if "b" in mode:
-            with open(path, mode) as file:
-                file.write(content)
-        else:
-            with open(path, mode, encoding = "utf-8") as file:
-                file.write(content)
-
-def genAssets():
-    icon_data = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x06\x00\x00\x00szz\xf4\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc4\x00\x00\x0e\xc4\x01\x95+\x0e\x1b\x00\x00\x00\x96IDATXG\xed\x97\xe1\n\x80 \x0c\x84\xb5\xf7\x7f\x83\xfe\xf5\xa2V0\xa1\xc8\xdb\xa6\x19k\xb0\x0fb?\xd6\xf28\xaf\xc2\\JI\x96,T\xcd\xe8u@{s\xa6*\xe2\xce\x81\xe9\xb4\x04|\xad\xe8\xb6=\xbf\xde\x82\xdaP\x07\n\xc0>\xc7\xdc\x81\x10\xe0N\xc0z\\(\xb5\\\x0f\xd2\xfb\x16p\x89F=n&2\x10\x02B@\x08\xf0\'\xa0\xf95#\xb8\x1ed\xc4\x81\xa9""\x03\x1a\x01\xf0w\xa9\xa0\xcenT\x1fH\xe7\x827\x8b_\x81\xd9\x90\x1c8\x07\x87\xd2M\x88\xf3\xe6\'#\xe3\x10\xa6\xb4\x03\xef\xb0&\xfd[z\x16\xee\x00\x00\x00\x00IEND\xaeB`\x82'
-    inv_icon_data = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x06\x00\x00\x00szz\xf4\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc4\x00\x00\x0e\xc4\x01\x95+\x0e\x1b\x00\x00\x00\x8aIDATXG\xed\x96\xe1\n\x80 \x0c\x84\xad\xf7\x7f\x83\xfe\xf5\xa2e1\xa1h\x9bs\t%\xbb\x0fd\xa0\xe8\x8e\xf3@Sx&\xaaV6\xaa5\xcc\xe7\xceT\xe3\xc2Ye\xb5\xd9\xcb\xad\xe7\xaf\xaf\xe0p\xa2\x87\x1b\xea9\x9f;\x00\x01\xc3\tX\xf2\x90\x02\xa5\xad\xb9\xe0\xd2\xcb\xcd\x15\xa45m\x0f2\x00\x01\x10\x00\x01\xe3\t\xd0>\x9b\xad\x1f\xdc\x13\x8f\x03]E \x03\x16\x01\xe2Kf\xa0\xec]\xa9>\xa8\xdd\xd9\x9b\xe6W\xc4>\xd6\xd0x\x854\x872\x1a)\xed\x08\xcc\x15\xfb;\x9bb\x84\x00\x00\x00\x00IEND\xaeB`\x82'
-    settings_data = "{\"app_name\": \"TinyBin\", \"icon_path\":\"./bin.png\", \"version\": \"v0.1.2\", \"lang\": \"./eng.json\"}"
-    rus_data = "{\"filedialog.title\": \"Выберите иконку\", \"element.close\": \"Закрыть\", \"element.add_startup\": \"Добавить в автозагрузку\", \"element.remove_startup\": \"Удалить из автозагрузки\", \"element.clear\": \"Очистить\", \"element.open\": \"Открыть в проводнике\", \"element.icon_menu\": \"Иконка\", \"element.lang_menu\": \"Язык\", \"element.change_icon\": \"Сменить\", \"element.reset_icon\": \"Сбросить\", \"tooltip.kb\": \"КБ\", \"tooltip.mb\": \"МБ\", \"tooltip.gb\": \"ГБ\", \"tooltip.f1\": \"файл\", \"tooltip.f2\": \"файла\", \"tooltip.f3\": \"файлов\"}"
-    eng_data = "{\"filedialog.title\": \"Choose icon image\", \"element.close\": \"Quit\", \"element.add_startup\": \"Add to startup\", \"element.remove_startup\": \"Remove from stratup\", \"element.clear\": \"Clear\", \"element.open\": \"Open in explorer\", \"element.icon_menu\": \"Icon\", \"element.lang_menu\": \"Language\", \"element.change_icon\": \"Change\", \"element.reset_icon\": \"Reset\", \"tooltip.kb\": \"KB\", \"tooltip.mb\": \"MB\", \"tooltip.gb\": \"GB\", \"tooltip.f1\": \"files\", \"tooltip.f2\": \"files\", \"tooltip.f3\": \"files\"}"
-    initFile("./bin.png", icon_data, "wb")
-    initFile("./bin_inv.png", inv_icon_data, "wb")
-    initFile("./settings.json", settings_data)
-    initFile("./rus.json", rus_data)
-    initFile("./eng.json", eng_data)
-
 def sysThemeIsDark():
     registry = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize")
     value, _ = winreg.QueryValueEx(registry, "AppsUseLightTheme")
@@ -55,17 +34,25 @@ class TrashTrayIcon(QSystemTrayIcon):
         self.clear_bin = self.menu.addAction(translatable("element.clear"))
         self.clear_bin.triggered.connect(self.clearBin)
         self.open_bin = self.menu.addAction(translatable("element.open"))
-        self.open_bin.triggered.connect(lambda: os.system("start shell:RecycleBinFolder"))
+        self.open_bin.triggered.connect(lambda: os.system("start shell:RecycleBinFolder -WindowStyle Hidden"))
         self.icon_menu = self.menu.addMenu(translatable("element.icon_menu"))
         self.change_icon = self.icon_menu.addAction(translatable("element.change_icon"))
         self.change_icon.triggered.connect(self.changeIcon)
         self.reset_icon = self.icon_menu.addAction(translatable("element.reset_icon"))
         self.reset_icon.triggered.connect(self.resetIcon)
         self.lang_menu = self.menu.addMenu(translatable("element.lang_menu"))
-        self.rus_lang = self.lang_menu.addAction("Русский")
-        self.rus_lang.triggered.connect(lambda: self.setLang("./rus.json"))
-        self.eng_lang = self.lang_menu.addAction("English")
-        self.eng_lang.triggered.connect(lambda: self.setLang("./eng.json"))
+        self.addLangAction("Русский", "./lang/ru.json")
+        self.addLangAction("Беларусская", "./lang/be.json")
+        self.addLangAction("English", "./lang/en.json")
+        self.addLangAction("Français", "./lang/fr.json")
+        self.addLangAction("Deutsche", "./lang/de.json")
+        self.addLangAction("Español", "./lang/es.json")
+        self.addLangAction("Português", "./lang/pt.json")
+        self.addLangAction("Polski", "./lang/pl.json")
+        self.addLangAction("Italiano", "./lang/it.json")
+        self.addLangAction("中文", "./lang/zh.json")
+        self.addLangAction("日本語", "./lang/ja.json")
+        self.addLangAction("한국어", "./lang/ko.json")
         self.tooltip_timer = QTimer(self)
         self.tooltip_timer.timeout.connect(self.formatTooltip)
         self.tooltip_timer.start(100)
@@ -73,6 +60,9 @@ class TrashTrayIcon(QSystemTrayIcon):
         self.theme_timer.timeout.connect(self.setIconTheme)
         self.theme_timer.start(100)
         self.setContextMenu(self.menu)
+        
+    def addLangAction(self, name, path):
+        self.lang_menu.addAction(name).triggered.connect(lambda: self.setLang(path))
     
     def startupAction(self):
         if self.isInStartup(settings["app_name"]):
@@ -104,8 +94,8 @@ class TrashTrayIcon(QSystemTrayIcon):
         winreg.CloseKey(key)
     
     def setIconTheme(self):
-        if settings["icon_path"] in ["./bin.png", "./bin_inv.png"]:
-            icon = "./bin.png" if sysThemeIsDark() else "./bin_inv.png"
+        if settings["icon_path"] in ["./assets/bin.png", "./assets/bin_inv.png"]:
+            icon = "./assets/bin.png" if sysThemeIsDark() else "./assets/bin_inv.png"
             self.setIcon(QIcon(icon))                
             settings["icon_path"] = icon
             with open("./settings.json", "w") as file:
@@ -160,8 +150,8 @@ class TrashTrayIcon(QSystemTrayIcon):
         return (bin_info.i64Size) / 1024
     
     def resetIcon(self):
-        self.setIcon(QIcon("./bin.png"))
-        settings["icon_path"] = "./bin.png"
+        self.setIcon(QIcon("./assets/bin.png"))
+        settings["icon_path"] = "./assets/bin.png"
         with open("./settings.json", "w") as file:
             json.dump(settings, file)
         self.menu.close()
@@ -191,7 +181,7 @@ class DragDropWindow(QWidget):
         self.setAcceptDrops(True)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.onMousePosition)
-        self.timer.start(100)
+        self.timer.start(10)
 
     def onMousePosition(self):
         cursor_pos = QCursor.pos()
@@ -225,7 +215,6 @@ class DragDropWindow(QWidget):
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
-    genAssets()
     with open("./settings.json") as file:
         settings = json.load(file)
     with open(settings["lang"], "r+", encoding = "UTF-8") as file:

@@ -1,0 +1,18 @@
+{
+    "filedialog.title": "Выберыце значок",
+    "element.close": "Зачыніць",
+    "element.add_startup": "Дадаць у аўтазагрузку",
+    "element.remove_startup": "Выдаліць з аўтазагрузкі",
+    "element.clear": "Ачысціць",
+    "element.open": "Адкрыць у правадыры",
+    "element.icon_menu": "Значок",
+    "element.lang_menu": "Мова",
+    "element.change_icon": "Змяніць",
+    "element.reset_icon": "Скід",
+    "tooltip.kb": "КБ",
+    "tooltip.mb": "МБ",
+    "tooltip.gb": "ГБ",
+    "tooltip.f1": "файл",
+    "tooltip.f2": "файлы",
+    "tooltip.f3": "файлаў"
+}
