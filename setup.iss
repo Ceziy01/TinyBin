@@ -65,7 +65,7 @@ Filename: "{cmd}"; Parameters: "/C ""taskkill /im TinyBin.exe /f /t"; Flags: run
 Filename: "{cmd}"; Parameters: "/C reg delete ""HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"" /v TinyBin /f"; Flags: runhidden
 
 [Icons]
-Name: "{autoprograms}\TinyBin"; Filename: "{app}\TinyBin.exe"; IconFilename: "{app}\bin.ico"
+Name: "{autoprograms}\TinyBin"; Filename: "{app}\TinyBin.exe"; IconFilename: "{app}\assets\bin.ico"
 
 [Run]
 Filename: "{app}\TinyBin.exe"; Description: "{cm:LaunchProgram,TinyBin}"; Flags: nowait postinstall skipifsilent
