@@ -1,5 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+installer/
+installer/TinyBinInstaller.exe
 *.py[cod]
 *$py.class
 
