@@ -1,0 +1,20 @@
+class KoreanTranslator:
+    def __init__(self):
+        self.translations = {
+            "filedialog.title": "아이콘 선택",
+            "element.close": "닫기",
+            "element.add_startup": "자동 시작에 추가",
+            "element.remove_startup": "자동 시작에서 제거",
+            "element.clear": "지우기",
+            "element.open": "파일 탐색기에서 열기",
+            "element.icon_menu": "아이콘",
+            "element.lang_menu": "언어",
+            "element.change_icon": "변경",
+            "element.reset_icon": "초기화",
+            "tooltip.kb": "KB",
+            "tooltip.mb": "MB",
+            "tooltip.gb": "GB"
+        }
+    
+    def filePluralize(self, count: int):
+        return f"{count}개 파일"
