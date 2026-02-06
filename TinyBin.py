@@ -59,7 +59,7 @@ class TrashTrayIcon(QSystemTrayIcon):
     def resetIconAction(self):
         self.setIcon(QIcon("./assets/bin.png"))
         settings["icon_path"] = "./assets/bin.png"
-        with open("./settings.json", "w") as file:
+        with open(settings_path, "w") as file:
             json.dump(settings, file)
         self.menu.close()
         self.setIconTheme(sysThemeIsDark())
@@ -202,7 +202,7 @@ class DragDropWindow(QWidget):
                 try:
                     for file in files:
                         send2trash(file)
-                        if "minecraft_bundle" in file: tray.changeIcon("./assets/bundle.png")
+                        if "minecraft_bundle" in file: tray.changeIcon(os.path.join(app_dir, "assets/bundle.png"))
                 except Exception as e:
                     print(f"Хуйня какая-то: {e}")
             
@@ -210,17 +210,19 @@ class DragDropWindow(QWidget):
 
 
 if __name__ == "__main__":
-    if not os.path.exists("./settings.json"):
+    app_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    settings_path = os.path.join(app_dir, "settings.json")
+    if not os.path.exists(settings_path):
         settings = {
             "app_name": "TinyBin",
             "version": "0.2.1",
             "lang": "en",
-            "icon_path": "./assets/bin.png"
+            "icon_path": os.path.join(app_dir, "assets/bin.png")
         }
-        with open("./settings.json", "w") as file:
+        with open(settings_path, "w") as file:
             json.dump(settings, file)
     else:
-        with open("./settings.json") as file:
+        with open(settings_path) as file:
             settings = json.load(file)
     
     process_name = f"{settings["app_name"]}.exe"
