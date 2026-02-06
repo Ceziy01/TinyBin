@@ -68,6 +68,134 @@
   {
    "optionDest": "datas",
    "value": "C:/Users/cesiy/Python/TinyBin/utils.py;."
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtWebEngineWidgets"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtWebEngineCore"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtWebEngineQuick"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "tkinter"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "matplotlib"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtMultimedia"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtMultimediaWidgets"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtBluetooth"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtNfc"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtPositioning"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtSerialPort"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtSerialBus"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtSensors"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtCharts"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.Qt3DCore"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.Qt3DExtras"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.Qt3DRender"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.Qt3DInput"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtPrintSupport"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtSvg"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PyQt6.QtOpenGL"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "numpy"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "scipy"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "pandas"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "PIL"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "cv2"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "IPython"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "jupyter"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "email"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "http"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "xml"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "unittest"
   }
  ],
  "nonPyinstallerOptions": {

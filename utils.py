@@ -1,6 +1,5 @@
 import ctypes, winreg, os, sys, winshell, subprocess
 from ctypes import wintypes
-from PyQt6.QtGui import QPalette
 
 class BinInfo(ctypes.Structure):
     _fields_ = [
@@ -8,6 +7,14 @@ class BinInfo(ctypes.Structure):
         ('i64Size', ctypes.c_longlong),
         ('i64NumItems', ctypes.c_longlong),
     ]
+    
+def sysThemeIsDark():
+    key = winreg.OpenKey(
+        winreg.HKEY_CURRENT_USER,
+        r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+    )
+    value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
+    return value == 0
     
 def appInStartup(name:str):
     try:
@@ -28,11 +35,6 @@ def removeFromStartup(name:str):
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run", 0, winreg.KEY_SET_VALUE)
     winreg.DeleteValue(key, name)
     winreg.CloseKey(key)
-    
-def sysThemeIsDark(app):
-    if app.palette().color(QPalette.ColorRole.Window).lightness() < 128:
-        return True
-    return False
 
 def getBinSize():
     bin_info = BinInfo()

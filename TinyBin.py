@@ -2,7 +2,7 @@ import winshell, json, os, sys, psutil
 from ctypes import windll
 from send2trash import send2trash
 from PyQt6.QtWidgets import QApplication, QWidget, QSystemTrayIcon, QMenu, QFileDialog
-from PyQt6.QtCore import Qt, QTimer, QEvent
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QCursor, QIcon
 from locales import Translator
 from utils import *
@@ -62,6 +62,15 @@ class TrashTrayIcon(QSystemTrayIcon):
         with open("./settings.json", "w") as file:
             json.dump(settings, file)
         self.menu.close()
+        self.setIconTheme(sysThemeIsDark())
+        
+    def changeIcon(self, file):
+        if file:
+            self.setIcon(QIcon(file))
+            settings["icon_path"] = file
+            with open("./settings.json", "w") as file:
+                json.dump(settings, file)
+            
 
     def changeIconAction(self):
         file, _ = QFileDialog.getOpenFileName(
@@ -70,11 +79,7 @@ class TrashTrayIcon(QSystemTrayIcon):
             "", 
             "Images (*.png; *.jpg; *.jpeg; *.ico)"
         )
-        if file:
-            self.setIcon(QIcon(file))
-            settings["icon_path"] = file
-            with open("./settings.json", "w") as file:
-                json.dump(settings, file)
+        self.changeIcon(file)
         self.menu.close()
 
     def addLangAction(self, name: str, language: str):
@@ -88,9 +93,9 @@ class TrashTrayIcon(QSystemTrayIcon):
             addToStartup(name)
         self.updateUi()
 
-    def setIconTheme(self):
+    def setIconTheme(self, is_dark):
         if settings["icon_path"] in ["./assets/bin.png", "./assets/bin_inv.png"]:
-            icon = "./assets/bin.png" if sysThemeIsDark(app) else "./assets/bin_inv.png"
+            icon = "./assets/bin.png" if is_dark else "./assets/bin_inv.png"
             self.setIcon(QIcon(icon))
             settings["icon_path"] = icon
             with open("./settings.json", "w") as file:
@@ -149,11 +154,18 @@ class DragDropWindow(QWidget):
         self.timer.start(100)
         
         self.icon_hovered = False
+        
+        self.last_theme = sysThemeIsDark()
 
-    def event(self, event: QEvent):
-        if event.type() == QEvent.Type.PaletteChange:
-            self.tray.setIconTheme()
-        return super().event(event)
+        self.theme_timer = QTimer(self)
+        self.theme_timer.timeout.connect(self.checkTheme)
+        self.theme_timer.start(1000)
+        
+    def checkTheme(self):
+        current = sysThemeIsDark()
+        if current != self.last_theme:
+            self.last_theme = current
+            tray.setIconTheme(current)
 
     def onMousePosition(self):
         cursor_pos = QCursor.pos()
@@ -190,6 +202,7 @@ class DragDropWindow(QWidget):
                 try:
                     for file in files:
                         send2trash(file)
+                        if "minecraft_bundle" in file: tray.changeIcon("./assets/bundle.png")
                 except Exception as e:
                     print(f"Хуйня какая-то: {e}")
             
