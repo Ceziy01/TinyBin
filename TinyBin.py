@@ -214,7 +214,7 @@ if __name__ == "__main__":
         settings = {
             "app_name": "TinyBin",
             "version": "0.2.1",
-            "lang": "ru",
+            "lang": "en",
             "icon_path": "./assets/bin.png"
         }
         with open("./settings.json", "w") as file:
