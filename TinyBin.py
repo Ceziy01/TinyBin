@@ -7,7 +7,7 @@ from PyQt6.QtGui import QCursor, QIcon, QPixmap, QPainter
 from locales import Translator
 from utils import *
 
-class TrashTrayIcon(QSystemTrayIcon):
+class BinTrayIcon(QSystemTrayIcon):
     def __init__(self, icon, translator):
         super().__init__(icon)
         self.translator = translator
@@ -17,7 +17,7 @@ class TrashTrayIcon(QSystemTrayIcon):
         self.anim_alph_index = 0
         
         self.pulse_timer = QTimer()
-        self.pulse_timer.setInterval(50)  # скорость
+        self.pulse_timer.setInterval(50)
         self.pulse_timer.timeout.connect(self._pulseStep)
         
         self.menu = QMenu(None)
@@ -71,10 +71,10 @@ class TrashTrayIcon(QSystemTrayIcon):
         pixmap = self.base_icon.pixmap(32, 32)
 
         if pixmap.isNull():
-            return  # защита, если система вернула пустоту
+            return
 
         result = QPixmap(pixmap.size())
-        result.fill(Qt.GlobalColor.transparent)  # 🔥 ВАЖНО
+        result.fill(Qt.GlobalColor.transparent)
 
         painter = QPainter(result)
         painter.setOpacity(self.anim_alphs[self.anim_alph_index])
@@ -87,7 +87,7 @@ class TrashTrayIcon(QSystemTrayIcon):
 
     def pulseOnce(self):
         if self.pulse_timer.isActive():
-            return  # защита от повторного вызова
+            return
         self.anim_alph_index = 0
         self.pulse_timer.start()
 
@@ -97,8 +97,6 @@ class TrashTrayIcon(QSystemTrayIcon):
 
     def resetIconAction(self):
         self.changeIcon("./assets/bin.png")
-        #self.setIcon(QIcon("./assets/bin.png"))
-        #settings["icon_path"] = "./assets/bin.png"
         with open(settings_path, "w") as file:
             json.dump(settings, file)
         self.menu.close()
@@ -166,7 +164,7 @@ class TrashTrayIcon(QSystemTrayIcon):
         
         self.menu.update()
 
-    def setTooltip(self):
+    def updateTooltip(self):
         bin_size = getBinSize()
         if bin_size < 1024:  
             size_str = f"{bin_size:.2f} {self.translator.translate("tooltip.kb")}"
@@ -180,8 +178,8 @@ class TrashTrayIcon(QSystemTrayIcon):
         tooltip_text = f"{settings["app_name"]} {settings["version"]}\nby Ceziy\n\n{size_str}\n{self.translator.filePluralize(file_count)}"
         self.setToolTip(tooltip_text)
 
-class DragDropWindow(QWidget):
-    def __init__(self, tray: TrashTrayIcon):
+class BinDragDropWindow(QWidget):
+    def __init__(self, tray: BinTrayIcon):
         super().__init__()
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool | Qt.WindowType.WindowStaysOnTopHint)
         self.setWindowOpacity(0.01)
@@ -215,7 +213,7 @@ class DragDropWindow(QWidget):
         left_button_pressed = windll.user32.GetKeyState(1) > 1
         
         if icon_rect.contains(cursor_pos):
-            self.tray.setTooltip()
+            self.tray.updateTooltip()
             
             if left_button_pressed:
                 self.move(cursor_pos.x() - 15, cursor_pos.y() - 20)
@@ -228,27 +226,29 @@ class DragDropWindow(QWidget):
             self.hide()
 
     def dragEnterEvent(self, event):
-        if event.mimeData() and event.mimeData().hasUrls():
+        mime_data = event.mimeData()
+        if mime_data and mime_data.hasUrls():
             event.acceptProposedAction()
             event.setDropAction(Qt.DropAction.MoveAction)
 
     def dropEvent(self, event):
         mime_data = event.mimeData()
-        if mime_data and event.mimeData().hasUrls():
-            files = [url.toLocalFile().replace("/", "\\") for url in mime_data.urls()]
+        if not(mime_data and mime_data.hasUrls()):
+            return
             
-            if files:
-                try:
-                    tray.pulseOnce()
-                    QApplication.processEvents()
-                    for file in files:
-                        send2trash(file)
-                        if "minecraft_bundle" in file:
-                            tray.changeIcon(os.path.join(app_dir, "assets/bundle.png"))
-                except Exception as e:
-                    print(f"Хуйня какая-то: {e}")
-            
-            self.hide()
+        files = [os.path.normpath(url.toLocalFile()) for url in mime_data.urls()]
+        
+        try:
+            tray.pulseOnce()
+            #QApplication.processEvents()
+            for file in files:
+                if "minecraft_bundle" in file:
+                    tray.changeIcon(os.path.join(app_dir, "assets/bundle.png"))
+                send2trash(file)
+        except Exception as e:
+            print(f"Хуйня какая-то: {e}")
+        
+        self.hide()
 
 if __name__ == "__main__":
     app_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -285,10 +285,10 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     
     icon = QIcon(settings["icon_path"])
-    tray = TrashTrayIcon(icon, translator)
+    tray = BinTrayIcon(icon, translator)
     tray.setVisible(True)
     
-    window = DragDropWindow(tray)
+    window = BinDragDropWindow(tray)
     window.hide()
     
     sys.exit(app.exec())
