@@ -20,7 +20,7 @@
 - Korean
 
 # App's functions
-- Drag and drop files on app's icon in systray to move them to recycle been:
+- Drag and drop files on app's icon in systray to move them to recycle bin:
   
 ![](https://github.com/Ceziy01/TinyBin/blob/main/examples/drag_and_drop.gif)
 
