@@ -18,7 +18,7 @@ class BinTrayIcon(QSystemTrayIcon):
         
         self.pulse_timer = QTimer()
         self.pulse_timer.setInterval(50)
-        self.pulse_timer.timeout.connect(self._pulseStep)
+        self.pulse_timer.timeout.connect(self.pulseStep)
         
         self.menu = QMenu(None)
         self.menu.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
@@ -59,9 +59,9 @@ class BinTrayIcon(QSystemTrayIcon):
         self.setContextMenu(self.menu)
         self.updateUi()
         
-        self.activated.connect(self.trayiconclicked)
+        self.activated.connect(self.trayIconClicked)
         
-    def _pulseStep(self):
+    def pulseStep(self):
         if self.anim_alph_index >= len(self.anim_alphs):
             self.pulse_timer.stop()
             self.setIcon(self.base_icon)
@@ -91,7 +91,7 @@ class BinTrayIcon(QSystemTrayIcon):
         self.anim_alph_index = 0
         self.pulse_timer.start()
 
-    def trayiconclicked(self, reason):
+    def trayIconClicked(self, reason):
         if reason == self.ActivationReason.DoubleClick:
             openBinInExplorer()
 

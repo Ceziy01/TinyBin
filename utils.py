@@ -19,7 +19,7 @@ def sysThemeIsDark():
 def appInStartup(name:str):
     try:
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run", 0, winreg.KEY_READ)
-        value, regtype = winreg.QueryValueEx(key, name)
+        _, _ = winreg.QueryValueEx(key, name)
         winreg.CloseKey(key)
         return True
     except FileNotFoundError:
@@ -52,5 +52,6 @@ def openBinInExplorer():
     )
     
 def clearBin():
-    if len(list(winshell.recycle_bin())) != 0:
-        winshell.recycle_bin().empty()
+    bin = winshell.recycle_bin()
+    if list(bin):
+        bin.empty()
