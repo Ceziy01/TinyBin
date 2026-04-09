@@ -41,5 +41,6 @@
 ![](https://github.com/Ceziy01/TinyBin/blob/main/examples/open_bin.gif)
 
 # Contacts
-DM me in discord if u have any questions ;)
-@Ceziy056
+DM me in if u have any questions ;)
+Discord @Ceziy056
+Telegram @Serge065
