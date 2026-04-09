@@ -36,7 +36,7 @@
 
 ![](https://github.com/Ceziy01/TinyBin/blob/main/examples/clear_bin.gif)
 
-- Opening the recycle bin:
+- Opening the recycle bin with double click or in context menu:
 
 ![](https://github.com/Ceziy01/TinyBin/blob/main/examples/open_bin.gif)
 
