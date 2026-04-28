@@ -37,7 +37,7 @@ class Translator:
     def translate(self, key: str):
         if self.translator is None:
             raise RuntimeError("Translator err")
-        return self.translator.translations.get(key)
+        return self.translator.translations.get(key, key)
 
     def filePluralize(self, count: int):
         if self.translator is None:

@@ -1,5 +1,7 @@
 import ctypes, winreg, os, sys, winshell, subprocess
 from ctypes import wintypes
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QPixmap, QPainter
 
 class BinInfo(ctypes.Structure):
     _fields_ = [
@@ -8,12 +10,25 @@ class BinInfo(ctypes.Structure):
         ('i64NumItems', ctypes.c_longlong),
     ]
     
-def sysThemeIsDark():
-    key = winreg.OpenKey(
-        winreg.HKEY_CURRENT_USER,
-        r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+def getIcon(path: str):
+    scaled = QPixmap(path).scaled(
+        32, 32,
+        Qt.AspectRatioMode.KeepAspectRatio,
+        Qt.TransformationMode.SmoothTransformation
     )
+    canvas = QPixmap(32, 32)
+    canvas.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(canvas)
+    x = (32 - scaled.width()) // 2
+    y = (32 - scaled.height()) // 2
+    painter.drawPixmap(x, y, scaled)
+    painter.end()
+    return QIcon(canvas)
+    
+def sysThemeIsDark():
+    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize")
     value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
+    winreg.CloseKey(key)
     return value == 0
     
 def appInStartup(name:str):

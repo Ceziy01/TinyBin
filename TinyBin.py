@@ -67,13 +67,13 @@ class BinTrayIcon(QSystemTrayIcon):
             self.setIcon(self.base_icon)
             self.anim_alph_index = 0
             return
+        
+        size = self.base_icon.actualSize(self.geometry().size())
+        pixmap = self.base_icon.pixmap(size)
+        
+        if pixmap.isNull(): return
 
-        pixmap = self.base_icon.pixmap(32, 32)
-
-        if pixmap.isNull():
-            return
-
-        result = QPixmap(pixmap.size())
+        result = QPixmap(size)
         result.fill(Qt.GlobalColor.transparent)
 
         painter = QPainter(result)
@@ -96,29 +96,26 @@ class BinTrayIcon(QSystemTrayIcon):
             openBinInExplorer()
 
     def resetIconAction(self):
-        self.changeIcon("./assets/bin.png")
-        with open(settings_path, "w") as file:
-            json.dump(settings, file)
         self.menu.close()
-        self.setIconTheme(sysThemeIsDark())
+        self.setIconTheme(sysThemeIsDark(), reset = True)
         
-    def changeIcon(self, file):
-        if file:
-            self.base_icon = QIcon(file)
-            self.setIcon(self.base_icon)
-            settings["icon_path"] = file
-            with open("./settings.json", "w") as file:
-                json.dump(settings, file)
-            
+    def changeIcon(self, path):
+        if not path: return
+        self.base_icon = getIcon(path)
+        self.setIcon(self.base_icon)
 
+        settings["icon_path"] = path
+        with open("./settings.json", "w") as f:
+            json.dump(settings, f)
+            
     def changeIconAction(self):
-        file, _ = QFileDialog.getOpenFileName(
+        path, _ = QFileDialog.getOpenFileName(
             self.menu, 
             self.translator.translate("filedialog.title"), 
             "", 
             "Images (*.png; *.jpg; *.jpeg; *.ico)"
         )
-        self.changeIcon(file)
+        self.changeIcon(path)
         self.menu.close()
 
     def addLangAction(self, name: str, language: str):
@@ -132,9 +129,9 @@ class BinTrayIcon(QSystemTrayIcon):
             addToStartup(name)
         self.updateUi()
 
-    def setIconTheme(self, is_dark):
-        if settings["icon_path"] in ["./assets/bin.png", "./assets/bin_inv.png"]:
-            icon = "./assets/bin.png" if is_dark else "./assets/bin_inv.png"
+    def setIconTheme(self, is_dark, reset = False):
+        if (settings["icon_path"] in ["./assets/bin.png", "./assets/bin_inv.png"]) or reset:
+            icon = os.path.join(app_dir, "assets/bin.png" if is_dark else "assets/bin_inv.png")
             self.changeIcon(icon)
             settings["icon_path"] = icon
             with open("./settings.json", "w") as file:
@@ -204,7 +201,7 @@ class BinDragDropWindow(QWidget):
         current = sysThemeIsDark()
         if current != self.last_theme:
             self.last_theme = current
-            tray.setIconTheme(current)
+            self.tray.setIconTheme(current)
 
     def onMousePosition(self):
         cursor_pos = QCursor.pos()
@@ -239,11 +236,11 @@ class BinDragDropWindow(QWidget):
         files = [os.path.normpath(url.toLocalFile()) for url in mime_data.urls()]
         
         try:
-            tray.pulseOnce()
+            self.tray.pulseOnce()
             #QApplication.processEvents()
             for file in files:
                 if "minecraft_bundle" in file:
-                    tray.changeIcon(os.path.join(app_dir, "assets/bundle.png"))
+                    self.tray.changeIcon(os.path.join(app_dir, "assets/bundle.png"))
                 send2trash(file)
         except Exception as e:
             print(f"Хуйня какая-то: {e}")
@@ -283,8 +280,8 @@ if __name__ == "__main__":
     
     translator = Translator(settings["lang"])
     app = QApplication(sys.argv)
-    
-    icon = QIcon(settings["icon_path"])
+
+    icon = getIcon(settings["icon_path"])
     tray = BinTrayIcon(icon, translator)
     tray.setVisible(True)
     
