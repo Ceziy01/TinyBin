@@ -1,16 +1,17 @@
-import winshell, json, os, sys, psutil
-from ctypes import windll
-from send2trash import send2trash
-from PyQt6.QtWidgets import QApplication, QWidget, QSystemTrayIcon, QMenu, QFileDialog
+import winshell, json, os, sys
+from PyQt6.QtWidgets import QSystemTrayIcon, QMenu, QFileDialog
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QCursor, QIcon, QPixmap, QPainter
-from locales import Translator
+from PyQt6.QtGui import QIcon, QPixmap, QPainter
+
 from utils import *
 
 class BinTrayIcon(QSystemTrayIcon):
-    def __init__(self, icon, translator):
+    def __init__(self, icon, translator, settings, app_dir):
         super().__init__(icon)
         self.translator = translator
+        self.settings = settings
+        self.app_dir = app_dir
+        self.settings_path = os.path.join(app_dir, "settings.json")
         self.base_icon = icon
         self._pulse_icon = None
         self.anim_alphs = [1.0, 0.7, 0.4, 0.7]
@@ -104,9 +105,9 @@ class BinTrayIcon(QSystemTrayIcon):
         self.base_icon = getIcon(path)
         self.setIcon(self.base_icon)
 
-        settings["icon_path"] = path
-        with open("./settings.json", "w") as f:
-            json.dump(settings, f)
+        self.settings["icon_path"] = path
+        with open(self.settings_path, "w") as f:
+            json.dump(self.settings, f)
             
     def changeIconAction(self):
         path, _ = QFileDialog.getOpenFileName(
@@ -122,7 +123,7 @@ class BinTrayIcon(QSystemTrayIcon):
         self.lang_menu.addAction(name).triggered.connect(lambda: self.setLang(language))
 
     def startupAction(self):
-        name = settings["app_name"]
+        name = self.settings["app_name"]
         if appInStartup(name):
             removeFromStartup(name)
         else:
@@ -130,23 +131,23 @@ class BinTrayIcon(QSystemTrayIcon):
         self.updateUi()
 
     def setIconTheme(self, is_dark, reset = False):
-        if (settings["icon_path"] in ["./assets/bin.png", "./assets/bin_inv.png"]) or reset:
-            icon = os.path.join(app_dir, "assets/bin.png" if is_dark else "assets/bin_inv.png")
+        if (self.settings["icon_path"] in ["./assets/bin.png", "./assets/bin_inv.png"]) or reset:
+            icon = os.path.join(self.app_dir, "assets/bin.png" if is_dark else "assets/bin_inv.png")
             self.changeIcon(icon)
-            settings["icon_path"] = icon
-            with open("./settings.json", "w") as file:
-                json.dump(settings, file)
+            self.settings["icon_path"] = icon
+            with open(self.settings_path, "w") as file:
+                json.dump(self.settings, file)
 
     def setLang(self, language: str):
         self.translator.loadLang(language)
         self.updateUi()
-        settings["lang"] = language
-        with open("./settings.json", "w") as file:
-            json.dump(settings, file)
+        self.settings["lang"] = language
+        with open(self.settings_path, "w") as file:
+            json.dump(self.settings, file)
 
     def updateUi(self):
         self.exit_action.setText(self.translator.translate("element.close"))
-        if appInStartup(settings["app_name"]):
+        if appInStartup(self.settings["app_name"]):
             startup_text = self.translator.translate("element.remove_startup")
         else:
             startup_text = self.translator.translate("element.add_startup")
@@ -172,120 +173,5 @@ class BinTrayIcon(QSystemTrayIcon):
         
         file_count = len(list(winshell.recycle_bin()))
         
-        tooltip_text = f"{settings["app_name"]} {settings["version"]}\nby Ceziy\n\n{size_str}\n{self.translator.filePluralize(file_count)}"
+        tooltip_text = f"{self.settings["app_name"]} {self.settings["version"]}\nby Ceziy\n\n{size_str}\n{self.translator.filePluralize(file_count)}"
         self.setToolTip(tooltip_text)
-
-class BinDragDropWindow(QWidget):
-    def __init__(self, tray: BinTrayIcon):
-        super().__init__()
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool | Qt.WindowType.WindowStaysOnTopHint)
-        self.setWindowOpacity(0.01)
-        self.setFixedSize(30, 40)
-        self.move(1015, 676)
-        self.tray = tray
-        self.setAcceptDrops(True)
-        
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.onMousePosition)
-        self.timer.start(100)
-        
-        self.icon_hovered = False
-        
-        self.last_theme = sysThemeIsDark()
-
-        self.theme_timer = QTimer(self)
-        self.theme_timer.timeout.connect(self.checkTheme)
-        self.theme_timer.start(1000)
-        
-    def checkTheme(self):
-        current = sysThemeIsDark()
-        if current != self.last_theme:
-            self.last_theme = current
-            self.tray.setIconTheme(current)
-
-    def onMousePosition(self):
-        cursor_pos = QCursor.pos()
- 
-        icon_rect = self.tray.geometry()
-        left_button_pressed = windll.user32.GetKeyState(1) > 1
-        
-        if icon_rect.contains(cursor_pos):
-            self.tray.updateTooltip()
-            
-            if left_button_pressed:
-                self.move(cursor_pos.x() - 15, cursor_pos.y() - 20)
-                self.show()
-
-                if not self.icon_hovered:
-                    self.icon_hovered = True
-        else:
-            self.icon_hovered = False
-            self.hide()
-
-    def dragEnterEvent(self, event):
-        mime_data = event.mimeData()
-        if mime_data and mime_data.hasUrls():
-            event.acceptProposedAction()
-            event.setDropAction(Qt.DropAction.MoveAction)
-
-    def dropEvent(self, event):
-        mime_data = event.mimeData()
-        if not(mime_data and mime_data.hasUrls()):
-            return
-            
-        files = [os.path.normpath(url.toLocalFile()) for url in mime_data.urls()]
-        
-        try:
-            self.tray.pulseOnce()
-            #QApplication.processEvents()
-            for file in files:
-                if "minecraft_bundle" in file:
-                    self.tray.changeIcon(os.path.join(app_dir, "assets/bundle.png"))
-                send2trash(file)
-        except Exception as e:
-            print(f"Хуйня какая-то: {e}")
-        
-        self.hide()
-
-if __name__ == "__main__":
-    app_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    settings_path = os.path.join(app_dir, "settings.json")
-    if not os.path.exists(settings_path):
-        settings = {
-            "app_name": "TinyBin",
-            "version": "0.2.1",
-            "lang": "en",
-            "icon_path": os.path.join(app_dir, "assets/bin.png")
-        }
-        with open(settings_path, "w") as file:
-            json.dump(settings, file)
-    else:
-        with open(settings_path) as file:
-            settings = json.load(file)
-    
-    process_name = f"{settings["app_name"]}.exe"
-    running_processes = []
-    
-    for proc in psutil.process_iter(["name"]):
-        try:
-            if proc.info["name"] == process_name:
-                running_processes.append(proc)
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            pass
-    
-    if len(running_processes) > 1:
-        sys.exit()
-    
-    os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
-    
-    translator = Translator(settings["lang"])
-    app = QApplication(sys.argv)
-
-    icon = getIcon(settings["icon_path"])
-    tray = BinTrayIcon(icon, translator)
-    tray.setVisible(True)
-    
-    window = BinDragDropWindow(tray)
-    window.hide()
-    
-    sys.exit(app.exec())
